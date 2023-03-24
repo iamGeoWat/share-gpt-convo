@@ -46,7 +46,7 @@ function toggleCheckboxes() {
   const checkboxes = document.querySelectorAll('.custom-checkbox');
 
   checkboxes.forEach(checkbox => {
-    checkbox.style.display = showingCheckboxes ? 'none' : 'block';
+    checkbox.style.display = showingCheckboxes ? 'block' : 'none';
   });
 
   if (saveButton) {
@@ -64,11 +64,58 @@ shareButton.addEventListener('click', () => {
   shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
   addCheckboxes();
   toggleCheckboxes();
-  alert("Share button clicked")
+  // alert("Share button clicked")
 });
 
 // Create the Save button
 addSaveButton();
+
+let blocksToShare = [];
+
+function saveToImage() {
+  const board = document.createElement('div');
+  board.style.paddingLeft = '50px';
+  board.style.paddingRight = '50px';
+  board.style.paddingTop = '100px';
+  board.style.paddingBottom = '100px';
+  board.style.backgroundColor = 'rgba(52, 53, 65, 1)';
+  blocksToShare.forEach(block => {
+    const card = document.createElement('div');
+    // clone each child element of the block to card
+    block.childNodes.forEach(child => {
+      card.appendChild(child.cloneNode(true));
+    });
+    board.appendChild(card);
+  });
+
+  document.body.appendChild(board);
+
+  html2canvas(board).then(canvas => {
+    // Convert the canvas to a data URL
+    const dataUrl = canvas.toDataURL('image/png');
+
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    document.body.appendChild(img);
+    // open image in new tab
+    console.log(dataUrl);
+
+
+
+    // // Create a link element to download the image
+    // const link = document.createElement('a');
+    // link.href = dataUrl;
+    // link.download = 'div-image.png';
+    // link.style.display = 'none';
+    //
+    // // Add the link to the DOM and trigger the download
+    // document.body.appendChild(link);
+    // link.click();
+    //
+    // // Clean up the link element
+    // document.body.removeChild(link);
+  });
+}
 
 function addSaveButton() {
   saveButton = document.createElement('button');
@@ -89,7 +136,19 @@ function addSaveButton() {
   saveButton.style.fontWeight = 'normal'; // Optional: make the button text bold
 
   saveButton.addEventListener('click', () => {
-    alert('Save button clicked!');
+    console.log('Save button clicked!');
+    blocksToShare = [];
+    // get all the checked checkboxes
+    const checkedCheckboxes = document.querySelectorAll('.custom-checkbox input[type="checkbox"]:checked');
+    checkedCheckboxes.forEach(checkbox => {
+      // get attribute value of shareid of the checkbox
+      const shareId = checkbox.id;
+      // get the element with the same shareid
+      const element = document.querySelector(`[shareId="${shareId}"]`);
+      blocksToShare.push(element);
+      console.log('blocksToShare', blocksToShare);
+      saveToImage();
+    });
   });
 
   document.body.appendChild(saveButton);
@@ -101,18 +160,20 @@ function addCheckboxes() {
     // Create a new container for the custom checkbox
     const checkboxContainer = document.createElement('div');
     checkboxContainer.className = 'custom-checkbox';
-    checkboxContainer.style.position = 'fixed';
-    checkboxContainer.style.right = '10px';
+    checkboxContainer.style.position = 'absolute';
+    checkboxContainer.style.right = '-8em';
     checkboxContainer.style.zIndex = 10000;
 
     // Create a new checkbox input element
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    checkbox.id = `checkbox-${Math.random().toString(36).substr(2, 9)}`; // Generate a random ID for the checkbox
+    const randomId = Math.random().toString(36).substring(2, 9);
+    checkbox.id = randomId;
+    element.setAttribute('shareId', `${randomId}`);
 
     // Position the checkbox container vertically in the center of the element
-    const elementRect = element.getBoundingClientRect();
-    checkboxContainer.style.top = `${elementRect.top + (elementRect.height / 2) - (checkbox.offsetHeight / 2)}px`;
+    // const elementRect = element.getBoundingClientRect();
+    // checkboxContainer.style.top = `${elementRect.top + (elementRect.height / 2) - (checkbox.offsetHeight / 2)}px`;
 
     // Create a label for the custom checkbox
     const label = document.createElement('label');
@@ -124,7 +185,7 @@ function addCheckboxes() {
 
     // Add the container to the body (since it's using 'fixed' positioning)
     checkboxContainer.style.display = showingCheckboxes ? 'block' : 'none';
-    document.body.appendChild(checkboxContainer);
+    element.parentElement.appendChild(checkboxContainer);
   });
 }
 
@@ -192,3 +253,4 @@ function injectStyles() {
 
 // todo: match checkbox with answers
 // todo: when save button is clicked, save the checked answers to image
+// todo: crop the dialogs when starting selection
