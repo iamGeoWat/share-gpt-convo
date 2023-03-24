@@ -1,0 +1,53 @@
+/* Hide the default checkbox */
+.custom-checkbox input[type='checkbox'] {
+  display: none;
+}
+
+/* Create a custom checkbox */
+.custom-checkbox label {
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+}
+
+/* Create the custom checkbox indicator */
+.custom-checkbox label::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #eee;
+  border: 2px solid #555;
+  border-radius: 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Style the custom checkbox when checked */
+.custom-checkbox input[type='checkbox']:checked + label::before {
+  background-color: #66bb6a;
+  border-color: #66bb6a;
+}
+
+/* Create the checkmark for the custom checkbox */
+.custom-checkbox label::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 7px;
+  width: 8px;
+  height: 14px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Show the checkmark when the custom checkbox is checked */
+.custom-checkbox input[type='checkbox']:checked + label::after {
+  opacity: 1;
+}
