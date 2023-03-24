@@ -78,27 +78,56 @@ function saveToImage() {
   board.style.paddingRight = '50px';
   board.style.paddingTop = '100px';
   board.style.paddingBottom = '100px';
-  board.style.backgroundColor = 'rgba(52, 53, 65, 1)';
+  board.style.backgroundColor = '#131723';
+  board.style.backgroundImage = 'url(https://nipponcolors.com/images/texture.png)';
   blocksToShare.forEach(block => {
     const card = document.createElement('div');
+    card.className = 'share-card';
+    card.style.boxShadow = '5px 10px 30px -10px rgba(0, 0, 20, 0.4)';
+    card.style.padding = '30px';
+    card.style.borderRadius = '5px';
+    card.style.marginBottom = '50px';
+    card.style.backgroundColor = '#222734';
+    card.style.backgroundImage = 'url(https://nipponcolors.com/images/texture.png)';
+    const title = document.createElement('h2');
+    title.textContent = 'iamGeoWat:';
+    title.marginBottom = '20px';
+    card.appendChild(title);
+
     // clone each child element of the block to card
     block.childNodes.forEach(child => {
-      card.appendChild(child.cloneNode(true));
+      let clonedNode = child.cloneNode(true);
+      console.log(clonedNode.tagName)
+      if (clonedNode.tagName === 'PRE') {
+        // hide a button element inside it
+        clonedNode.querySelector('button').style.visibility = 'hidden';
+      }
+      clonedNode.style.marginBottom = '20px';
+      card.appendChild(clonedNode);
     });
     board.appendChild(card);
   });
 
   document.body.appendChild(board);
+  const boardBounds = board.getBoundingClientRect();
 
-  html2canvas(board).then(canvas => {
+  htmlToImage.toPng(board, {
+    width: boardBounds.width,
+    height: boardBounds.height,
+    style: {
+      transform: 'scale(1)',
+      left: 0,
+      top: 0,
+    }
+  }).then(canvas => {
     // Convert the canvas to a data URL
-    const dataUrl = canvas.toDataURL('image/png');
+    // const dataUrl = canvas.toDataURL('image/png');
 
     const img = document.createElement('img');
-    img.src = dataUrl;
+    img.src = canvas;
     document.body.appendChild(img);
     // open image in new tab
-    console.log(dataUrl);
+    console.log(canvas);
 
 
 
@@ -147,8 +176,9 @@ function addSaveButton() {
       const element = document.querySelector(`[shareId="${shareId}"]`);
       blocksToShare.push(element);
       console.log('blocksToShare', blocksToShare);
-      saveToImage();
+
     });
+    saveToImage();
   });
 
   document.body.appendChild(saveButton);
