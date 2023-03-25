@@ -319,3 +319,10 @@ shareButton.style.height = '40px';
 shareButton.style.cursor = 'pointer';
 shareButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
 shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
+
+// todo: take style out to injectStyles
+// todo: add header logo
+// todo: change extension logo
+// todo: write readme, git repo description
+
+// todo: add light mode
