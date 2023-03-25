@@ -324,5 +324,7 @@ shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
 // todo: add header logo
 // todo: change extension logo
 // todo: write readme, git repo description
+// todo: use actual user name in the output image
 
+// todo: enhance styles, better mobile reading
 // todo: add light mode
