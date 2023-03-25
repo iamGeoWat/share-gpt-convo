@@ -72,14 +72,22 @@ addSaveButton();
 
 let blocksToShare = [];
 
+function isQuestion(node) {
+  return node.firstChild.nodeType === Node.TEXT_NODE;
+}
+
 function saveToImage() {
+  const texture = 'https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png';
   const board = document.createElement('div');
   board.style.paddingLeft = '50px';
   board.style.paddingRight = '50px';
   board.style.paddingTop = '100px';
   board.style.paddingBottom = '100px';
   board.style.backgroundColor = '#131723';
-  board.style.backgroundImage = 'url(https://nipponcolors.com/images/texture.png)';
+  console.log('asfasfasfasf')
+  board.style.backgroundImage = `url(${texture})`;
+  console.log('asfasfasfasf')
+
   blocksToShare.forEach(block => {
     const card = document.createElement('div');
     card.className = 'share-card';
@@ -88,28 +96,36 @@ function saveToImage() {
     card.style.borderRadius = '5px';
     card.style.marginBottom = '50px';
     card.style.backgroundColor = '#222734';
-    card.style.backgroundImage = 'url(https://nipponcolors.com/images/texture.png)';
+    card.style.backgroundImage = `url(${texture})`;
     const title = document.createElement('h2');
-    title.textContent = 'iamGeoWat:';
+    title.textContent = isQuestion(block) ? 'iamGeoWat:' : 'OpenAI:';
     title.marginBottom = '20px';
     card.appendChild(title);
 
-    // clone each child element of the block to card
-    block.childNodes.forEach(child => {
-      let clonedNode = child.cloneNode(true);
-      console.log(clonedNode.tagName)
-      if (clonedNode.tagName === 'PRE') {
-        // hide a button element inside it
-        clonedNode.querySelector('button').style.visibility = 'hidden';
-      }
-      clonedNode.style.marginBottom = '20px';
-      card.appendChild(clonedNode);
-    });
+    if (isQuestion(block)) {
+      const text = document.createElement('p');
+      text.textContent = block.firstChild.textContent;
+      card.appendChild(text);
+    } else {
+      // clone each child element of the block to card
+      block.childNodes.forEach(child => {
+        let clonedNode = child.cloneNode(true);
+        console.log(clonedNode.tagName)
+        if (clonedNode.tagName === 'PRE') {
+          // hide a button element inside it
+          clonedNode.querySelector('button').style.visibility = 'hidden';
+        }
+        clonedNode.style.marginBottom = '20px';
+        card.appendChild(clonedNode);
+      });
+    }
     board.appendChild(card);
   });
 
   document.body.appendChild(board);
   const boardBounds = board.getBoundingClientRect();
+
+  console.log('xxxxxxxxxxxxx')
 
   htmlToImage.toPng(board, {
     width: boardBounds.width,
@@ -119,17 +135,14 @@ function saveToImage() {
       left: 0,
       top: 0,
     }
-  }).then(canvas => {
+  }).then(dataUrl => {
     // Convert the canvas to a data URL
     // const dataUrl = canvas.toDataURL('image/png');
 
     const img = document.createElement('img');
-    img.src = canvas;
+    img.src = dataUrl;
     document.body.appendChild(img);
     // open image in new tab
-    console.log(canvas);
-
-
 
     // // Create a link element to download the image
     // const link = document.createElement('a');
@@ -185,8 +198,11 @@ function addSaveButton() {
 }
 
 function addCheckboxes() {
-  let answers = document.querySelectorAll('div.markdown.prose.w-full.break-words');
-  answers.forEach(element => {
+  let dialogs = document.querySelectorAll('div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap');
+  dialogs.forEach(element => {
+    if (!isQuestion(element)) {
+      element = element.firstChild;
+    }
     // Create a new container for the custom checkbox
     const checkboxContainer = document.createElement('div');
     checkboxContainer.className = 'custom-checkbox';
