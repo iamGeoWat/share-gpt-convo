@@ -15,34 +15,30 @@ const htmlToImage = require('html-to-image');
 
 // Create a new button element
 const shareButton = document.createElement('button');
-
-// Add content or attributes to the button
-shareButton.textContent = 'Share';
-shareButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent blue
-shareButton.style.color = 'white';
-shareButton.style.border = 'none';
-shareButton.style.borderRadius = '5px'; // Rounded corners
-shareButton.style.position = 'fixed';
-shareButton.style.top = '20px';
-shareButton.style.right = '20px';
-shareButton.style.width = '120px'; // Adjust width for a rectangle
-shareButton.style.height = '40px';
-shareButton.style.cursor = 'pointer';
-shareButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
-shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
-
-// Add the button to the webpage
-document.body.appendChild(shareButton);
-
-injectStyles();
-
 let showingCheckboxes = false;
 let saveButton;
 let blocksToShare = [];
 
+// Create the Save button
+addSaveButton();
+injectStyles();
+// Add the button to the webpage
+document.body.appendChild(shareButton);
+// Add click event listener to the button
+shareButton.addEventListener('click', () => {
+  // "Share": show checkboxes, text changes to "Cancel"
+  // "Cancel": hide checkboxes, text changes to "Share"
+  // if there were any checkboxes checked, show another button that says "Save"
+  showingCheckboxes = !showingCheckboxes;
+  shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
+  toggleCheckboxes();
+  toggleCollapseDialogs();
+  toggleSaveButton();
+});
+
 function removeCheckboxes() {
   const checkboxes = document.querySelectorAll('.custom-checkbox');
-  checkboxes.forEach(checkbox => {
+  checkboxes.forEach((checkbox) => {
     checkbox.remove();
   });
 }
@@ -61,42 +57,22 @@ function toggleCheckboxes() {
   }
 }
 
-
-// Add click event listener to the button
-shareButton.addEventListener('click', () => {
-  // "Share": show checkboxes, text changes to "Cancel"
-  // "Cancel": hide checkboxes, text changes to "Share"
-  // if there were any checkboxes checked, show another button that says "Save"
-  showingCheckboxes = !showingCheckboxes;
-  shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
-
-  toggleCheckboxes();
-  toggleCollapseDialogs();
-  toggleSaveButton();
-});
-
-// Create the Save button
-addSaveButton();
-
-
-
 function isQuestion(node) {
   return node.firstChild.nodeType === Node.TEXT_NODE;
 }
 
 function saveToImage() {
-  const texture = 'https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png';
+  const texture =
+    'https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png';
   const board = document.createElement('div');
   board.style.paddingLeft = '50px';
   board.style.paddingRight = '50px';
   board.style.paddingTop = '100px';
   board.style.paddingBottom = '100px';
   board.style.backgroundColor = '#131723';
-  console.log('asfasfasfasf')
   board.style.backgroundImage = `url(${texture})`;
-  console.log('asfasfasfasf')
 
-  blocksToShare.forEach(block => {
+  blocksToShare.forEach((block) => {
     const card = document.createElement('div');
     card.className = 'share-card';
     card.style.boxShadow = '5px 10px 30px -10px rgba(0, 0, 20, 0.4)';
@@ -116,9 +92,8 @@ function saveToImage() {
       card.appendChild(text);
     } else {
       // clone each child element of the block to card
-      block.childNodes.forEach(child => {
+      block.childNodes.forEach((child) => {
         let clonedNode = child.cloneNode(true);
-        console.log(clonedNode.tagName)
         if (clonedNode.tagName === 'PRE') {
           // hide a button element inside it
           clonedNode.querySelector('button').style.visibility = 'hidden';
@@ -134,39 +109,39 @@ function saveToImage() {
 
   const boardBounds = board.getBoundingClientRect();
 
-  console.log('xxxxxxxxxxxxx')
+  htmlToImage
+    .toPng(board, {
+      width: boardBounds.width,
+      height: boardBounds.height,
+      style: {
+        transform: 'scale(1)',
+        left: 0,
+        top: 0,
+      },
+    })
+    .then((dataUrl) => {
+      // Convert the canvas to a data URL
+      // const dataUrl = canvas.toDataURL('image/png');
 
-  htmlToImage.toPng(board, {
-    width: boardBounds.width,
-    height: boardBounds.height,
-    style: {
-      transform: 'scale(1)',
-      left: 0,
-      top: 0,
-    }
-  }).then(dataUrl => {
-    // Convert the canvas to a data URL
-    // const dataUrl = canvas.toDataURL('image/png');
+      // const img = document.createElement('img');
+      // img.src = dataUrl;
+      // document.body.appendChild(img);
+      // open image in new tab
 
-    // const img = document.createElement('img');
-    // img.src = dataUrl;
-    // document.body.appendChild(img);
-    // open image in new tab
+      document.body.removeChild(board);
+      // Create a link element to download the image
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = 'div-image.png';
+      link.style.display = 'none';
 
-    document.body.removeChild(board);
-    // Create a link element to download the image
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = 'div-image.png';
-    link.style.display = 'none';
+      // Add the link to the DOM and trigger the download
+      document.body.appendChild(link);
+      link.click();
 
-    // Add the link to the DOM and trigger the download
-    document.body.appendChild(link);
-    link.click();
-
-    // Clean up the link element
-    document.body.removeChild(link);
-  });
+      // Clean up the link element
+      document.body.removeChild(link);
+    });
 }
 
 function addSaveButton() {
@@ -188,18 +163,17 @@ function addSaveButton() {
   saveButton.style.fontWeight = 'normal'; // Optional: make the button text bold
 
   saveButton.addEventListener('click', () => {
-    console.log('Save button clicked!');
     blocksToShare = [];
     // get all the checked checkboxes
-    const checkedCheckboxes = document.querySelectorAll('.custom-checkbox input[type="checkbox"]:checked');
-    checkedCheckboxes.forEach(checkbox => {
+    const checkedCheckboxes = document.querySelectorAll(
+      '.custom-checkbox input[type="checkbox"]:checked'
+    );
+    checkedCheckboxes.forEach((checkbox) => {
       // get attribute value of shareid of the checkbox
       const shareId = checkbox.id;
       // get the element with the same shareid
       const element = document.querySelector(`[shareId="${shareId}"]`);
       blocksToShare.push(element);
-      console.log('blocksToShare', blocksToShare);
-
     });
     saveToImage();
   });
@@ -208,8 +182,10 @@ function addSaveButton() {
 }
 
 function toggleCollapseDialogs() {
-  let dialogs = document.querySelectorAll('div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap');
-  dialogs.forEach(element => {
+  let dialogs = document.querySelectorAll(
+    'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
+  );
+  dialogs.forEach((element) => {
     if (showingCheckboxes) {
       element.style.maxHeight = '1000px';
       element.style.overflow = 'hidden';
@@ -224,13 +200,14 @@ function toggleCollapseDialogs() {
         element.style.overflow = 'auto';
       }, 100);
     }
-
   });
 }
 
 function addCheckboxes() {
-  let dialogs = document.querySelectorAll('div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap');
-  dialogs.forEach(element => {
+  let dialogs = document.querySelectorAll(
+    'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
+  );
+  dialogs.forEach((element) => {
     if (!isQuestion(element)) {
       element = element.firstChild;
     }
@@ -328,5 +305,17 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// todo: when save button is clicked, save the checked answers to image
-// todo: crop the dialogs when starting selection
+// Add content or attributes to the button
+shareButton.textContent = 'Share';
+shareButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent blue
+shareButton.style.color = 'white';
+shareButton.style.border = 'none';
+shareButton.style.borderRadius = '5px'; // Rounded corners
+shareButton.style.position = 'fixed';
+shareButton.style.top = '20px';
+shareButton.style.right = '20px';
+shareButton.style.width = '120px'; // Adjust width for a rectangle
+shareButton.style.height = '40px';
+shareButton.style.cursor = 'pointer';
+shareButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
+shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
