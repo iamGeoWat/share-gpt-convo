@@ -11,10 +11,7 @@
 // For more information on Content Scripts,
 // See https://developer.chrome.com/extensions/content_scripts
 
-const html2canvas = require('html2canvas');
 const htmlToImage = require('html-to-image');
-const domtoimage = require('dom-to-image');
-
 
 // Create a new button element
 const shareButton = document.createElement('button');
@@ -41,16 +38,26 @@ injectStyles();
 
 let showingCheckboxes = false;
 let saveButton;
+let blocksToShare = [];
 
-function toggleCheckboxes() {
+function removeCheckboxes() {
   const checkboxes = document.querySelectorAll('.custom-checkbox');
-
   checkboxes.forEach(checkbox => {
-    checkbox.style.display = showingCheckboxes ? 'block' : 'none';
+    checkbox.remove();
   });
+}
 
+function toggleSaveButton() {
   if (saveButton) {
     saveButton.style.display = showingCheckboxes ? 'block' : 'none';
+  }
+}
+
+function toggleCheckboxes() {
+  if (showingCheckboxes) {
+    addCheckboxes();
+  } else {
+    removeCheckboxes();
   }
 }
 
@@ -62,15 +69,16 @@ shareButton.addEventListener('click', () => {
   // if there were any checkboxes checked, show another button that says "Save"
   showingCheckboxes = !showingCheckboxes;
   shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
-  addCheckboxes();
+
   toggleCheckboxes();
-  // alert("Share button clicked")
+  toggleCollapseDialogs();
+  toggleSaveButton();
 });
 
 // Create the Save button
 addSaveButton();
 
-let blocksToShare = [];
+
 
 function isQuestion(node) {
   return node.firstChild.nodeType === Node.TEXT_NODE;
@@ -123,6 +131,7 @@ function saveToImage() {
   });
 
   document.body.appendChild(board);
+
   const boardBounds = board.getBoundingClientRect();
 
   console.log('xxxxxxxxxxxxx')
@@ -139,23 +148,24 @@ function saveToImage() {
     // Convert the canvas to a data URL
     // const dataUrl = canvas.toDataURL('image/png');
 
-    const img = document.createElement('img');
-    img.src = dataUrl;
-    document.body.appendChild(img);
+    // const img = document.createElement('img');
+    // img.src = dataUrl;
+    // document.body.appendChild(img);
     // open image in new tab
 
-    // // Create a link element to download the image
-    // const link = document.createElement('a');
-    // link.href = dataUrl;
-    // link.download = 'div-image.png';
-    // link.style.display = 'none';
-    //
-    // // Add the link to the DOM and trigger the download
-    // document.body.appendChild(link);
-    // link.click();
-    //
-    // // Clean up the link element
-    // document.body.removeChild(link);
+    document.body.removeChild(board);
+    // Create a link element to download the image
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'div-image.png';
+    link.style.display = 'none';
+
+    // Add the link to the DOM and trigger the download
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up the link element
+    document.body.removeChild(link);
   });
 }
 
@@ -195,6 +205,27 @@ function addSaveButton() {
   });
 
   document.body.appendChild(saveButton);
+}
+
+function toggleCollapseDialogs() {
+  let dialogs = document.querySelectorAll('div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap');
+  dialogs.forEach(element => {
+    if (showingCheckboxes) {
+      element.style.maxHeight = '1000px';
+      element.style.overflow = 'hidden';
+      element.style.transition = 'max-height 0.5s ease-in-out';
+      setTimeout(() => {
+        element.style.maxHeight = '100px';
+      }, 100);
+    } else {
+      element.style.maxHeight = '1000px';
+      setTimeout(() => {
+        element.style.maxHeight = null;
+        element.style.overflow = 'auto';
+      }, 100);
+    }
+
+  });
 }
 
 function addCheckboxes() {
@@ -297,6 +328,5 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// todo: match checkbox with answers
 // todo: when save button is clicked, save the checked answers to image
 // todo: crop the dialogs when starting selection
