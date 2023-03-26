@@ -13,6 +13,11 @@
 
 const htmlToImage = require('html-to-image');
 
+let arbitaryClassNames = {
+  'avatar': '.rounded-sm',
+  'dialogs': 'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
+};
+
 let shareButton;
 let showingCheckboxes = false;
 let saveButton;
@@ -26,7 +31,7 @@ addShareButton();
 addSaveButton();
 
 function getAvatars() {
-  let avatars = document.querySelectorAll('.rounded-sm');
+  let avatars = document.querySelectorAll(arbitaryClassNames['avatar']);
   if (avatars[0] && avatars[0].tagName === 'IMG') {
     userAvatar = avatars[0];
     userName = avatars[0].alt;
@@ -126,6 +131,29 @@ function saveToImage() {
     board.appendChild(card);
   });
 
+  const footer = document.createElement('div');
+  footer.style.display = 'flex';
+  footer.style.alignItems = 'center';
+  footer.style.marginLeft = '1rem';
+  const logo = document.createElement('div');
+  logo.style.marginRight = '5px';
+  logo.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 100 100">
+          <g fill="#74728a">
+              <path xmlns="http://www.w3.org/2000/svg" d="M48,3.05c-24.824,0-44.951,20.126-44.951,44.951S23.176,92.95,48,92.95c24.826,0,44.951-20.124,44.951-44.949  S72.826,3.05,48,3.05z M63.924,80.312v-29.15c3.885-1.21,6.705-4.835,6.705-9.117c0-5.273-4.273-9.548-9.547-9.548  s-9.547,4.274-9.547,9.548c0,4.282,2.82,7.907,6.705,9.117v31.374c-3.246,0.963-6.684,1.48-10.24,1.48  c-19.891,0-36.014-16.125-36.014-36.015c0-14.174,8.188-26.434,20.092-32.311v29.15c-3.885,1.209-6.707,4.833-6.707,9.117  c0,5.271,4.275,9.547,9.549,9.547c5.271,0,9.547-4.275,9.547-9.547c0-4.284-2.822-7.908-6.707-9.117V13.465  c3.246-0.961,6.684-1.479,10.24-1.479c19.891,0,36.014,16.124,36.014,36.016C84.014,62.175,75.826,74.434,63.924,80.312z"></path>
+          </g>
+      </svg>
+  `;
+  const footerText = document.createElement('p');
+  footerText.style.fontSize = '0.8rem';
+  footerText.style.color = '#74728a';
+  footer.style.opacity = 0.8;
+  footerText.textContent = 'via ShareGPT - Chrome Extension';
+  footer.appendChild(logo);
+  footer.appendChild(footerText);
+
+  board.appendChild(footer);
+
   document.body.appendChild(board);
 
   const boardBounds = board.getBoundingClientRect();
@@ -141,7 +169,7 @@ function saveToImage() {
       },
     })
     .then((dataUrl) => {
-      document.body.removeChild(board);
+      // document.body.removeChild(board);
       // Create a link element to download the image
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -182,9 +210,7 @@ function addSaveButton() {
 }
 
 function toggleCollapseDialogs() {
-  let dialogs = document.querySelectorAll(
-    'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
-  );
+  let dialogs = document.querySelectorAll(arbitaryClassNames['dialogs']);
   dialogs.forEach((element) => {
     // animated collapse
     if (showingCheckboxes) {
@@ -205,9 +231,7 @@ function toggleCollapseDialogs() {
 }
 
 function addCheckboxes() {
-  let dialogs = document.querySelectorAll(
-    'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
-  );
+  let dialogs = document.querySelectorAll(arbitaryClassNames['dialogs']);
   dialogs.forEach((element) => {
     if (!isQuestion(element)) {
       element = element.firstChild;
@@ -322,8 +346,8 @@ function injectStyles() {
     .share-board {
       padding-left: 50px;
       padding-right: 50px;
-      padding-top: 100px;
-      padding-bottom: 100px;
+      padding-top: 80px;
+      padding-bottom: 60px;
       background-color: #131723;
       background-image: var(--texture-url);
     }
@@ -332,7 +356,7 @@ function injectStyles() {
       box-shadow: 5px 10px 30px -10px rgba(0, 0, 20, 0.4);
       padding: 30px;
       border-radius: 5px;
-      margin-bottom: 50px;
+      margin-bottom: 30px;
       background-color: #222734;
       background-image: var(--texture-url);
     }
@@ -360,11 +384,12 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// todo: add header logo
 // todo: change extension logo
 // todo: write readme, git repo description
+// todo: px to rem
 
 // todo: enhance styles, better mobile reading
 // todo: add light mode
 // todo: share as a link to a page with original content
 // todo: share as a video in the form of chatting
+// todo: not use arbitrary class names to locate contents
