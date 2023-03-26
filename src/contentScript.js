@@ -13,28 +13,31 @@
 
 const htmlToImage = require('html-to-image');
 
-// Create a new button element
-const shareButton = document.createElement('button');
+let shareButton;
 let showingCheckboxes = false;
 let saveButton;
 let blocksToShare = [];
 
-// Create the Save button
-addSaveButton();
 injectStyles();
-// Add the button to the webpage
-document.body.appendChild(shareButton);
-// Add click event listener to the button
-shareButton.addEventListener('click', () => {
-  // "Share": show checkboxes, text changes to "Cancel"
-  // "Cancel": hide checkboxes, text changes to "Share"
-  // if there were any checkboxes checked, show another button that says "Save"
-  showingCheckboxes = !showingCheckboxes;
-  shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
-  toggleCheckboxes();
-  toggleCollapseDialogs();
-  toggleSaveButton();
-});
+addShareButton();
+addSaveButton();
+
+function addShareButton() {
+  shareButton = document.createElement('button');
+  shareButton.textContent = 'Share';
+  shareButton.className = 'share-button';
+  shareButton.addEventListener('click', () => {
+    // "Share": show checkboxes, text changes to "Cancel"
+    // "Cancel": hide checkboxes, text changes to "Share"
+    // if there were any checkboxes checked, show another button that says "Save"
+    showingCheckboxes = !showingCheckboxes;
+    shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
+    toggleCheckboxes();
+    toggleCollapseDialogs();
+    toggleSaveButton();
+  });
+  document.body.appendChild(shareButton);
+}
 
 function removeCheckboxes() {
   const checkboxes = document.querySelectorAll('.custom-checkbox');
@@ -62,28 +65,15 @@ function isQuestion(node) {
 }
 
 function saveToImage() {
-  const texture =
-    'https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png';
   const board = document.createElement('div');
-  board.style.paddingLeft = '50px';
-  board.style.paddingRight = '50px';
-  board.style.paddingTop = '100px';
-  board.style.paddingBottom = '100px';
-  board.style.backgroundColor = '#131723';
-  board.style.backgroundImage = `url(${texture})`;
+  board.className = 'share-board';
 
   blocksToShare.forEach((block) => {
     const card = document.createElement('div');
     card.className = 'share-card';
-    card.style.boxShadow = '5px 10px 30px -10px rgba(0, 0, 20, 0.4)';
-    card.style.padding = '30px';
-    card.style.borderRadius = '5px';
-    card.style.marginBottom = '50px';
-    card.style.backgroundColor = '#222734';
-    card.style.backgroundImage = `url(${texture})`;
     const title = document.createElement('h2');
     title.textContent = isQuestion(block) ? 'iamGeoWat:' : 'OpenAI:';
-    title.marginBottom = '20px';
+    title.style.marginBottom = '20px';
     card.appendChild(title);
 
     if (isQuestion(block)) {
@@ -120,14 +110,6 @@ function saveToImage() {
       },
     })
     .then((dataUrl) => {
-      // Convert the canvas to a data URL
-      // const dataUrl = canvas.toDataURL('image/png');
-
-      // const img = document.createElement('img');
-      // img.src = dataUrl;
-      // document.body.appendChild(img);
-      // open image in new tab
-
       document.body.removeChild(board);
       // Create a link element to download the image
       const link = document.createElement('a');
@@ -147,20 +129,7 @@ function saveToImage() {
 function addSaveButton() {
   saveButton = document.createElement('button');
   saveButton.textContent = 'Save';
-  saveButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent blue
-  saveButton.style.color = 'white';
-  saveButton.style.border = 'none';
-  saveButton.style.borderRadius = '5px';
-  saveButton.style.position = 'fixed';
-  saveButton.style.top = '70px';
-  saveButton.style.cursor = 'pointer';
-  saveButton.style.display = 'none';
-  saveButton.style.right = '20px';
-  saveButton.style.width = '120px'; // Adjust width for a rectangle
-  saveButton.style.height = '40px';
-  saveButton.style.cursor = 'pointer';
-  saveButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
-  saveButton.style.fontWeight = 'normal'; // Optional: make the button text bold
+  saveButton.className = 'save-button';
 
   saveButton.addEventListener('click', () => {
     blocksToShare = [];
@@ -186,6 +155,7 @@ function toggleCollapseDialogs() {
     'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
   );
   dialogs.forEach((element) => {
+    // animated collapse
     if (showingCheckboxes) {
       element.style.maxHeight = '1000px';
       element.style.overflow = 'hidden';
@@ -214,9 +184,6 @@ function addCheckboxes() {
     // Create a new container for the custom checkbox
     const checkboxContainer = document.createElement('div');
     checkboxContainer.className = 'custom-checkbox';
-    checkboxContainer.style.position = 'absolute';
-    checkboxContainer.style.right = '-8em';
-    checkboxContainer.style.zIndex = 10000;
 
     // Create a new checkbox input element
     const checkbox = document.createElement('input');
@@ -224,10 +191,6 @@ function addCheckboxes() {
     const randomId = Math.random().toString(36).substring(2, 9);
     checkbox.id = randomId;
     element.setAttribute('shareId', `${randomId}`);
-
-    // Position the checkbox container vertically in the center of the element
-    // const elementRect = element.getBoundingClientRect();
-    // checkboxContainer.style.top = `${elementRect.top + (elementRect.height / 2) - (checkbox.offsetHeight / 2)}px`;
 
     // Create a label for the custom checkbox
     const label = document.createElement('label');
@@ -245,6 +208,12 @@ function addCheckboxes() {
 
 function injectStyles() {
   const css = `
+    .custom-checkbox {
+      position: absolute;
+      right: -8em;
+      z-index: 10000;
+    }
+
     /* Hide the default checkbox */
     .custom-checkbox input[type='checkbox'] {
       display: none;
@@ -298,6 +267,61 @@ function injectStyles() {
     .custom-checkbox input[type='checkbox']:checked + label::after {
       opacity: 1;
     }
+
+    /* style the share button */
+    .share-button {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 120px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 10000;
+      font-weight: normal;
+    }
+
+    :root {
+      --texture-url: url('https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png');
+    }
+
+    .share-board {
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 100px;
+      padding-bottom: 100px;
+      background-color: #131723;
+      background-image: var(--texture-url);
+    }
+
+    .share-card {
+      box-shadow: 5px 10px 30px -10px rgba(0, 0, 20, 0.4);
+      padding: 30px;
+      border-radius: 5px;
+      margin-bottom: 50px;
+      background-color: #222734;
+      background-image: var(--texture-url);
+    }
+
+    .save-button {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      position: fixed;
+      top: 70px;
+      cursor: pointer;
+      display: none;
+      right: 20px;
+      width: 120px;
+      height: 40px;
+      z-index: 10000;
+      font-weight: normal;
+    }
+
   `;
 
   const style = document.createElement('style');
@@ -305,22 +329,6 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// Add content or attributes to the button
-shareButton.textContent = 'Share';
-shareButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent blue
-shareButton.style.color = 'white';
-shareButton.style.border = 'none';
-shareButton.style.borderRadius = '5px'; // Rounded corners
-shareButton.style.position = 'fixed';
-shareButton.style.top = '20px';
-shareButton.style.right = '20px';
-shareButton.style.width = '120px'; // Adjust width for a rectangle
-shareButton.style.height = '40px';
-shareButton.style.cursor = 'pointer';
-shareButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
-shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
-
-// todo: take style out to injectStyles
 // todo: add header logo
 // todo: change extension logo
 // todo: write readme, git repo description
@@ -328,3 +336,5 @@ shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
 
 // todo: enhance styles, better mobile reading
 // todo: add light mode
+// todo: share as a link to a page with original content
+// todo: share as a video in the form of chatting
