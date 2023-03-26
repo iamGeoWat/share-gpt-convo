@@ -13,28 +13,50 @@
 
 const htmlToImage = require('html-to-image');
 
-// Create a new button element
-const shareButton = document.createElement('button');
+let arbitaryClassNames = {
+  'avatar': '.rounded-sm',
+  'dialogs': 'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
+};
+
+let shareButton;
 let showingCheckboxes = false;
 let saveButton;
 let blocksToShare = [];
+let userAvatar;
+let userName;
+let gptAvatar;
 
-// Create the Save button
-addSaveButton();
 injectStyles();
-// Add the button to the webpage
-document.body.appendChild(shareButton);
-// Add click event listener to the button
-shareButton.addEventListener('click', () => {
-  // "Share": show checkboxes, text changes to "Cancel"
-  // "Cancel": hide checkboxes, text changes to "Share"
-  // if there were any checkboxes checked, show another button that says "Save"
-  showingCheckboxes = !showingCheckboxes;
-  shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
-  toggleCheckboxes();
-  toggleCollapseDialogs();
-  toggleSaveButton();
-});
+addShareButton();
+addSaveButton();
+
+function getAvatars() {
+  let avatars = document.querySelectorAll(arbitaryClassNames['avatar']);
+  if (avatars[0] && avatars[0].tagName === 'IMG') {
+    userAvatar = avatars[0];
+    userName = avatars[0].alt;
+  }
+  if (avatars[1] && avatars[1].tagName === 'DIV') {
+    gptAvatar = avatars[1].firstChild;
+  }
+}
+
+function addShareButton() {
+  shareButton = document.createElement('button');
+  shareButton.textContent = 'Share';
+  shareButton.className = 'share-button';
+  shareButton.addEventListener('click', () => {
+    // "Share": show checkboxes, text changes to "Cancel"
+    // "Cancel": hide checkboxes, text changes to "Share"
+    // if there were any checkboxes checked, show another button that says "Save"
+    showingCheckboxes = !showingCheckboxes;
+    shareButton.textContent = showingCheckboxes ? 'Cancel' : 'Share';
+    toggleCheckboxes();
+    toggleCollapseDialogs();
+    toggleSaveButton();
+  });
+  document.body.appendChild(shareButton);
+}
 
 function removeCheckboxes() {
   const checkboxes = document.querySelectorAll('.custom-checkbox');
@@ -62,28 +84,32 @@ function isQuestion(node) {
 }
 
 function saveToImage() {
-  const texture =
-    'https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png';
   const board = document.createElement('div');
-  board.style.paddingLeft = '50px';
-  board.style.paddingRight = '50px';
-  board.style.paddingTop = '100px';
-  board.style.paddingBottom = '100px';
-  board.style.backgroundColor = '#131723';
-  board.style.backgroundImage = `url(${texture})`;
+  board.className = 'share-board';
 
   blocksToShare.forEach((block) => {
     const card = document.createElement('div');
     card.className = 'share-card';
-    card.style.boxShadow = '5px 10px 30px -10px rgba(0, 0, 20, 0.4)';
-    card.style.padding = '30px';
-    card.style.borderRadius = '5px';
-    card.style.marginBottom = '50px';
-    card.style.backgroundColor = '#222734';
-    card.style.backgroundImage = `url(${texture})`;
-    const title = document.createElement('h2');
-    title.textContent = isQuestion(block) ? 'iamGeoWat:' : 'OpenAI:';
-    title.marginBottom = '20px';
+    // create a title with avatar
+    getAvatars();
+    const titleText = document.createElement('h2');
+    titleText.textContent = isQuestion(block) ? 'Me' : 'GPT';
+    const title = document.createElement('div');
+    const titleAvatar = isQuestion(block) ? userAvatar.cloneNode(true) : gptAvatar.cloneNode(true);
+    titleAvatar.style.position = 'relative';
+    titleAvatar.style.height = '1.5rem';
+    titleAvatar.style.width = '1.5rem';
+    const titleAvatarWrapper = document.createElement('div');
+    titleAvatarWrapper.style.maxWidth = '1.5rem';
+    titleAvatarWrapper.style.marginRight = '10px';
+    titleAvatarWrapper.appendChild(titleAvatar);
+    title.style.marginBottom = '20px';
+    title.style.height = '1.5rem';
+    title.style.display = 'flex';
+    title.style.alignItems = 'center';
+    title.appendChild(titleAvatarWrapper);
+    title.appendChild(titleText);
+
     card.appendChild(title);
 
     if (isQuestion(block)) {
@@ -105,6 +131,29 @@ function saveToImage() {
     board.appendChild(card);
   });
 
+  const footer = document.createElement('div');
+  footer.style.display = 'flex';
+  footer.style.alignItems = 'center';
+  footer.style.marginLeft = '1rem';
+  const logo = document.createElement('div');
+  logo.style.marginRight = '5px';
+  logo.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 100 100">
+          <g fill="#74728a">
+              <path xmlns="http://www.w3.org/2000/svg" d="M48,3.05c-24.824,0-44.951,20.126-44.951,44.951S23.176,92.95,48,92.95c24.826,0,44.951-20.124,44.951-44.949  S72.826,3.05,48,3.05z M63.924,80.312v-29.15c3.885-1.21,6.705-4.835,6.705-9.117c0-5.273-4.273-9.548-9.547-9.548  s-9.547,4.274-9.547,9.548c0,4.282,2.82,7.907,6.705,9.117v31.374c-3.246,0.963-6.684,1.48-10.24,1.48  c-19.891,0-36.014-16.125-36.014-36.015c0-14.174,8.188-26.434,20.092-32.311v29.15c-3.885,1.209-6.707,4.833-6.707,9.117  c0,5.271,4.275,9.547,9.549,9.547c5.271,0,9.547-4.275,9.547-9.547c0-4.284-2.822-7.908-6.707-9.117V13.465  c3.246-0.961,6.684-1.479,10.24-1.479c19.891,0,36.014,16.124,36.014,36.016C84.014,62.175,75.826,74.434,63.924,80.312z"></path>
+          </g>
+      </svg>
+  `;
+  const footerText = document.createElement('p');
+  footerText.style.fontSize = '0.8rem';
+  footerText.style.color = '#74728a';
+  footer.style.opacity = 0.8;
+  footerText.textContent = 'via ShareGPT - Chrome Extension';
+  footer.appendChild(logo);
+  footer.appendChild(footerText);
+
+  board.appendChild(footer);
+
   document.body.appendChild(board);
 
   const boardBounds = board.getBoundingClientRect();
@@ -120,15 +169,7 @@ function saveToImage() {
       },
     })
     .then((dataUrl) => {
-      // Convert the canvas to a data URL
-      // const dataUrl = canvas.toDataURL('image/png');
-
-      // const img = document.createElement('img');
-      // img.src = dataUrl;
-      // document.body.appendChild(img);
-      // open image in new tab
-
-      document.body.removeChild(board);
+      // document.body.removeChild(board);
       // Create a link element to download the image
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -147,20 +188,7 @@ function saveToImage() {
 function addSaveButton() {
   saveButton = document.createElement('button');
   saveButton.textContent = 'Save';
-  saveButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent blue
-  saveButton.style.color = 'white';
-  saveButton.style.border = 'none';
-  saveButton.style.borderRadius = '5px';
-  saveButton.style.position = 'fixed';
-  saveButton.style.top = '70px';
-  saveButton.style.cursor = 'pointer';
-  saveButton.style.display = 'none';
-  saveButton.style.right = '20px';
-  saveButton.style.width = '120px'; // Adjust width for a rectangle
-  saveButton.style.height = '40px';
-  saveButton.style.cursor = 'pointer';
-  saveButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
-  saveButton.style.fontWeight = 'normal'; // Optional: make the button text bold
+  saveButton.className = 'save-button';
 
   saveButton.addEventListener('click', () => {
     blocksToShare = [];
@@ -182,10 +210,9 @@ function addSaveButton() {
 }
 
 function toggleCollapseDialogs() {
-  let dialogs = document.querySelectorAll(
-    'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
-  );
+  let dialogs = document.querySelectorAll(arbitaryClassNames['dialogs']);
   dialogs.forEach((element) => {
+    // animated collapse
     if (showingCheckboxes) {
       element.style.maxHeight = '1000px';
       element.style.overflow = 'hidden';
@@ -204,9 +231,7 @@ function toggleCollapseDialogs() {
 }
 
 function addCheckboxes() {
-  let dialogs = document.querySelectorAll(
-    'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
-  );
+  let dialogs = document.querySelectorAll(arbitaryClassNames['dialogs']);
   dialogs.forEach((element) => {
     if (!isQuestion(element)) {
       element = element.firstChild;
@@ -214,9 +239,6 @@ function addCheckboxes() {
     // Create a new container for the custom checkbox
     const checkboxContainer = document.createElement('div');
     checkboxContainer.className = 'custom-checkbox';
-    checkboxContainer.style.position = 'absolute';
-    checkboxContainer.style.right = '-8em';
-    checkboxContainer.style.zIndex = 10000;
 
     // Create a new checkbox input element
     const checkbox = document.createElement('input');
@@ -224,10 +246,6 @@ function addCheckboxes() {
     const randomId = Math.random().toString(36).substring(2, 9);
     checkbox.id = randomId;
     element.setAttribute('shareId', `${randomId}`);
-
-    // Position the checkbox container vertically in the center of the element
-    // const elementRect = element.getBoundingClientRect();
-    // checkboxContainer.style.top = `${elementRect.top + (elementRect.height / 2) - (checkbox.offsetHeight / 2)}px`;
 
     // Create a label for the custom checkbox
     const label = document.createElement('label');
@@ -245,6 +263,12 @@ function addCheckboxes() {
 
 function injectStyles() {
   const css = `
+    .custom-checkbox {
+      position: absolute;
+      right: -8em;
+      z-index: 10000;
+    }
+
     /* Hide the default checkbox */
     .custom-checkbox input[type='checkbox'] {
       display: none;
@@ -298,6 +322,61 @@ function injectStyles() {
     .custom-checkbox input[type='checkbox']:checked + label::after {
       opacity: 1;
     }
+
+    /* style the share button */
+    .share-button {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 120px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 10000;
+      font-weight: normal;
+    }
+
+    :root {
+      --texture-url: url('https://res.cloudinary.com/dpbummzhu/image/upload/v1679739844/img/texture_zwgmki.png');
+    }
+
+    .share-board {
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 80px;
+      padding-bottom: 60px;
+      background-color: #131723;
+      background-image: var(--texture-url);
+    }
+
+    .share-card {
+      box-shadow: 5px 10px 30px -10px rgba(0, 0, 20, 0.4);
+      padding: 30px;
+      border-radius: 5px;
+      margin-bottom: 30px;
+      background-color: #222734;
+      background-image: var(--texture-url);
+    }
+
+    .save-button {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      position: fixed;
+      top: 70px;
+      cursor: pointer;
+      display: none;
+      right: 20px;
+      width: 120px;
+      height: 40px;
+      z-index: 10000;
+      font-weight: normal;
+    }
+
   `;
 
   const style = document.createElement('style');
@@ -305,17 +384,11 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// Add content or attributes to the button
-shareButton.textContent = 'Share';
-shareButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent blue
-shareButton.style.color = 'white';
-shareButton.style.border = 'none';
-shareButton.style.borderRadius = '5px'; // Rounded corners
-shareButton.style.position = 'fixed';
-shareButton.style.top = '20px';
-shareButton.style.right = '20px';
-shareButton.style.width = '120px'; // Adjust width for a rectangle
-shareButton.style.height = '40px';
-shareButton.style.cursor = 'pointer';
-shareButton.style.zIndex = 10000; // A high value to ensure it appears on top of other elements
-shareButton.style.fontWeight = 'normal'; // Optional: make the button text bold
+// todo: write readme, git repo description
+// todo: px to rem
+
+// todo: enhance styles, better mobile reading
+// todo: add light mode
+// todo: share as a link to a page with original content
+// todo: share as a video in the form of chatting
+// todo: not use arbitrary class names to locate contents
