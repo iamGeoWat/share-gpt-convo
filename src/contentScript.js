@@ -17,10 +17,24 @@ let shareButton;
 let showingCheckboxes = false;
 let saveButton;
 let blocksToShare = [];
+let userAvatar;
+let userName;
+let gptAvatar;
 
 injectStyles();
 addShareButton();
 addSaveButton();
+
+function getAvatars() {
+  let avatars = document.querySelectorAll('.rounded-sm');
+  if (avatars[0] && avatars[0].tagName === 'IMG') {
+    userAvatar = avatars[0];
+    userName = avatars[0].alt;
+  }
+  if (avatars[1] && avatars[1].tagName === 'DIV') {
+    gptAvatar = avatars[1].firstChild;
+  }
+}
 
 function addShareButton() {
   shareButton = document.createElement('button');
@@ -71,9 +85,26 @@ function saveToImage() {
   blocksToShare.forEach((block) => {
     const card = document.createElement('div');
     card.className = 'share-card';
-    const title = document.createElement('h2');
-    title.textContent = isQuestion(block) ? 'iamGeoWat:' : 'OpenAI:';
+    // create a title with avatar
+    getAvatars();
+    const titleText = document.createElement('h2');
+    titleText.textContent = isQuestion(block) ? 'Me' : 'GPT';
+    const title = document.createElement('div');
+    const titleAvatar = isQuestion(block) ? userAvatar.cloneNode(true) : gptAvatar.cloneNode(true);
+    titleAvatar.style.position = 'relative';
+    titleAvatar.style.height = '1.5rem';
+    titleAvatar.style.width = '1.5rem';
+    const titleAvatarWrapper = document.createElement('div');
+    titleAvatarWrapper.style.maxWidth = '1.5rem';
+    titleAvatarWrapper.style.marginRight = '10px';
+    titleAvatarWrapper.appendChild(titleAvatar);
     title.style.marginBottom = '20px';
+    title.style.height = '1.5rem';
+    title.style.display = 'flex';
+    title.style.alignItems = 'center';
+    title.appendChild(titleAvatarWrapper);
+    title.appendChild(titleText);
+
     card.appendChild(title);
 
     if (isQuestion(block)) {
@@ -332,7 +363,6 @@ function injectStyles() {
 // todo: add header logo
 // todo: change extension logo
 // todo: write readme, git repo description
-// todo: use actual user name in the output image
 
 // todo: enhance styles, better mobile reading
 // todo: add light mode
