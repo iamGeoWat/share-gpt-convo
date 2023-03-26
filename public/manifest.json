@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Share Gpt",
-  "version": "0.1.0",
-  "description": "My Chrome Extension",
+  "name": "ShareGPT",
+  "version": "0.8.0",
+  "description": "Chrome extension to share GPT chats",
   "icons": {
     "16": "icons/icon_16.png",
     "32": "icons/icon_32.png",
@@ -16,7 +16,7 @@
     "default_title": "Share Gpt",
     "default_popup": "popup.html"
   },
-  "permissions": ["storage"],
+  "permissions": [],
   "content_scripts": [
     {
       "matches": ["*://chat.openai.com/chat/*"],

@@ -384,7 +384,6 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// todo: change extension logo
 // todo: write readme, git repo description
 // todo: px to rem
 
