@@ -1,7 +1,7 @@
 {
   "name": "share-gpt",
-  "version": "0.8.0",
-  "description": "Chrome extension to share GPT chats as better-looking images",
+  "version": "0.9.0",
+  "description": "Add a Share Button to your ChatGPT experience! Share GPT chats as better-looking images.",
   "private": true,
   "scripts": {
     "watch": "webpack --mode=development --watch --config config/webpack.config.js",
