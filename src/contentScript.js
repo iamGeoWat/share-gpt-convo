@@ -21,6 +21,7 @@ let arbitaryClassNames = {
 let shareButton;
 let showingCheckboxes = false;
 let saveButton;
+let saveButtonForMobileView;
 let blocksToShare = [];
 let userAvatar;
 let userName;
@@ -29,6 +30,55 @@ let gptAvatar;
 injectStyles();
 addShareButton();
 addSaveButton();
+addSaveButtonForMobileView();
+
+function addSaveButtonForMobileView() {
+  saveButtonForMobileView = document.createElement('button');
+  saveButtonForMobileView.textContent = 'Save: 📱 Style';
+  saveButtonForMobileView.className = 'save-button-for-mobile-view';
+
+  saveButtonForMobileView.addEventListener('click', () => {
+    blocksToShare = [];
+    // get all the checked checkboxes
+    const checkedCheckboxes = document.querySelectorAll(
+      '.custom-checkbox input[type="checkbox"]:checked'
+    );
+    checkedCheckboxes.forEach((checkbox) => {
+      // get attribute value of shareid of the checkbox
+      const shareId = checkbox.id;
+      // get the element with the same shareid
+      const element = document.querySelector(`[shareId="${shareId}"]`);
+      blocksToShare.push(element);
+    });
+    saveToImage({isMobile: true});
+  });
+
+  document.body.appendChild(saveButtonForMobileView);
+}
+
+function addSaveButton() {
+  saveButton = document.createElement('button');
+  saveButton.textContent = 'Save: 💻 Style';
+  saveButton.className = 'save-button';
+
+  saveButton.addEventListener('click', () => {
+    blocksToShare = [];
+    // get all the checked checkboxes
+    const checkedCheckboxes = document.querySelectorAll(
+      '.custom-checkbox input[type="checkbox"]:checked'
+    );
+    checkedCheckboxes.forEach((checkbox) => {
+      // get attribute value of shareid of the checkbox
+      const shareId = checkbox.id;
+      // get the element with the same shareid
+      const element = document.querySelector(`[shareId="${shareId}"]`);
+      blocksToShare.push(element);
+    });
+    saveToImage({isMobile: false});
+  });
+
+  document.body.appendChild(saveButton);
+}
 
 function getAvatars() {
   let avatars = document.querySelectorAll(arbitaryClassNames['avatar']);
@@ -69,6 +119,9 @@ function toggleSaveButton() {
   if (saveButton) {
     saveButton.style.display = showingCheckboxes ? 'block' : 'none';
   }
+  if (saveButtonForMobileView) {
+    saveButtonForMobileView.style.display = showingCheckboxes ? 'block' : 'none';
+  }
 }
 
 function toggleCheckboxes() {
@@ -83,9 +136,10 @@ function isQuestion(node) {
   return node.firstChild.nodeType === Node.TEXT_NODE;
 }
 
-function saveToImage() {
+function saveToImage({isMobile = false}) {
   const board = document.createElement('div');
   board.className = 'share-board';
+  board.style.width = isMobile ? '45rem' : 'null';
 
   blocksToShare.forEach((block) => {
     const card = document.createElement('div');
@@ -123,6 +177,7 @@ function saveToImage() {
         if (clonedNode.tagName === 'PRE') {
           // hide a button element inside it
           clonedNode.querySelector('button').style.visibility = 'hidden';
+          if (isMobile) clonedNode.querySelector('code').style.setProperty('white-space', 'pre-wrap', 'important');
         }
         clonedNode.style.marginBottom = '20px';
         card.appendChild(clonedNode);
@@ -169,11 +224,13 @@ function saveToImage() {
       },
     })
     .then((dataUrl) => {
-      // document.body.removeChild(board);
+      document.body.removeChild(board);
       // Create a link element to download the image
       const link = document.createElement('a');
       link.href = dataUrl;
-      link.download = 'div-image.png';
+      let date = new Date();
+      let dateString = `${date.getFullYear()}${date.getMonth()}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
+      link.download = `share-gpt_${dateString}.png`;
       link.style.display = 'none';
 
       // Add the link to the DOM and trigger the download
@@ -183,30 +240,6 @@ function saveToImage() {
       // Clean up the link element
       document.body.removeChild(link);
     });
-}
-
-function addSaveButton() {
-  saveButton = document.createElement('button');
-  saveButton.textContent = 'Save';
-  saveButton.className = 'save-button';
-
-  saveButton.addEventListener('click', () => {
-    blocksToShare = [];
-    // get all the checked checkboxes
-    const checkedCheckboxes = document.querySelectorAll(
-      '.custom-checkbox input[type="checkbox"]:checked'
-    );
-    checkedCheckboxes.forEach((checkbox) => {
-      // get attribute value of shareid of the checkbox
-      const shareId = checkbox.id;
-      // get the element with the same shareid
-      const element = document.querySelector(`[shareId="${shareId}"]`);
-      blocksToShare.push(element);
-    });
-    saveToImage();
-  });
-
-  document.body.appendChild(saveButton);
 }
 
 function toggleCollapseDialogs() {
@@ -377,6 +410,21 @@ function injectStyles() {
       font-weight: normal;
     }
 
+    .save-button-for-mobile-view {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      position: fixed;
+      top: 120px;
+      cursor: pointer;
+      display: none;
+      right: 20px;
+      width: 120px;
+      height: 40px;
+      z-index: 10000;
+      font-weight: normal;
+    }
   `;
 
   const style = document.createElement('style');
@@ -387,7 +435,6 @@ function injectStyles() {
 // todo: write readme, git repo description
 // todo: px to rem
 
-// todo: enhance styles, better mobile reading
 // todo: add light mode
 // todo: share as a link to a page with original content
 // todo: share as a video in the form of chatting
