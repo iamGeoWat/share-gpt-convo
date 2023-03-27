@@ -7,7 +7,7 @@ Share-GPT is a Chrome extension that allows users to easily generate images from
 
 - [ ] Write and Correct README and set up the Git repository description
 - [ ] Convert `px` to `rem` for better responsiveness
-- [ ] Enhance styles for better mobile readability
+- [x] Enhance styles for better mobile readability
 - [ ] Add light mode support
 - [ ] Implement sharing as a link to a page with the original content
 - [ ] Enable sharing as a video in the form of a chat conversation
