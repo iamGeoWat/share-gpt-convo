@@ -137,6 +137,10 @@ function isQuestion(node) {
 }
 
 function saveToImage({isMobile = false}) {
+  if (blocksToShare.length === 0) {
+    alert('No dialogs selected, please select some dialogs by clicking on the checkboxes on the right side of the dialogs.');
+    return;
+  }
   const board = document.createElement('div');
   board.className = 'share-board';
   board.style.width = isMobile ? '45rem' : 'null';
@@ -434,7 +438,6 @@ function injectStyles() {
 
 // todo: write readme, git repo description
 // todo: px to rem
-// todo: alert when no content is selected
 
 // todo: add light mode
 // todo: share as a link to a page with original content
