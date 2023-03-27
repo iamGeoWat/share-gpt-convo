@@ -434,6 +434,7 @@ function injectStyles() {
 
 // todo: write readme, git repo description
 // todo: px to rem
+// todo: alert when no content is selected
 
 // todo: add light mode
 // todo: share as a link to a page with original content
