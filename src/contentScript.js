@@ -137,6 +137,10 @@ function isQuestion(node) {
 }
 
 function saveToImage({isMobile = false}) {
+  if (blocksToShare.length === 0) {
+    alert('No dialogs selected, please select some dialogs by clicking on the checkboxes on the right side of the dialogs.');
+    return;
+  }
   const board = document.createElement('div');
   board.className = 'share-board';
   board.style.width = isMobile ? '45rem' : 'null';

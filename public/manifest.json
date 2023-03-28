@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ShareGPT",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Add a Share Button to your ChatGPT experience! Share GPT chats as better-looking images.",
   "icons": {
     "16": "icons/icon_16.png",
