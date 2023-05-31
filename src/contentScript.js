@@ -21,7 +21,6 @@ let arbitaryClassNames = {
 let shareButton;
 let showingCheckboxes = false;
 let saveButton;
-let saveButtonForMobileView;
 let blocksToShare = [];
 let userAvatar;
 let userName;
@@ -30,35 +29,10 @@ let gptAvatar;
 injectStyles();
 addShareButton();
 addSaveButton();
-addSaveButtonForMobileView();
-
-function addSaveButtonForMobileView() {
-  saveButtonForMobileView = document.createElement('button');
-  saveButtonForMobileView.textContent = 'Save: 📱 Style';
-  saveButtonForMobileView.className = 'save-button-for-mobile-view';
-
-  saveButtonForMobileView.addEventListener('click', () => {
-    blocksToShare = [];
-    // get all the checked checkboxes
-    const checkedCheckboxes = document.querySelectorAll(
-      '.custom-checkbox input[type="checkbox"]:checked'
-    );
-    checkedCheckboxes.forEach((checkbox) => {
-      // get attribute value of shareid of the checkbox
-      const shareId = checkbox.id;
-      // get the element with the same shareid
-      const element = document.querySelector(`[shareId="${shareId}"]`);
-      blocksToShare.push(element);
-    });
-    saveToImage({isMobile: true});
-  });
-
-  document.body.appendChild(saveButtonForMobileView);
-}
 
 function addSaveButton() {
   saveButton = document.createElement('button');
-  saveButton.textContent = 'Save: 💻 Style';
+  saveButton.textContent = 'Save PNG';
   saveButton.className = 'save-button';
 
   saveButton.addEventListener('click', () => {
@@ -67,6 +41,11 @@ function addSaveButton() {
     const checkedCheckboxes = document.querySelectorAll(
       '.custom-checkbox input[type="checkbox"]:checked'
     );
+    if (checkedCheckboxes.length === 0) {
+      // alert when no checkboxes are checked
+      alert('No dialogs selected, please select some dialogs by clicking on the checkboxes✅ on the right side👉. Enlarge the browser↔️ if you can\'t see the checkboxes.');
+      return
+    }
     checkedCheckboxes.forEach((checkbox) => {
       // get attribute value of shareid of the checkbox
       const shareId = checkbox.id;
@@ -74,21 +53,16 @@ function addSaveButton() {
       const element = document.querySelector(`[shareId="${shareId}"]`);
       blocksToShare.push(element);
     });
-    saveToImage({isMobile: false});
+    saveToImage();
   });
 
   document.body.appendChild(saveButton);
 }
 
 function getAvatars() {
-  let avatars = document.querySelectorAll(arbitaryClassNames['avatar']);
-  if (avatars[0] && avatars[0].tagName === 'IMG') {
-    userAvatar = avatars[0];
-    userName = avatars[0].alt;
-  }
-  if (avatars[1] && avatars[1].tagName === 'DIV') {
-    gptAvatar = avatars[1].firstChild;
-  }
+  userAvatar = document.querySelector(`img${arbitaryClassNames['avatar']}`);
+  if (userAvatar) userName = userAvatar.alt;
+  gptAvatar = document.querySelector(`div${arbitaryClassNames['avatar']}`).firstChild;
 }
 
 function addShareButton() {
@@ -119,9 +93,6 @@ function toggleSaveButton() {
   if (saveButton) {
     saveButton.style.display = showingCheckboxes ? 'block' : 'none';
   }
-  if (saveButtonForMobileView) {
-    saveButtonForMobileView.style.display = showingCheckboxes ? 'block' : 'none';
-  }
 }
 
 function toggleCheckboxes() {
@@ -136,14 +107,14 @@ function isQuestion(node) {
   return node.firstChild.nodeType === Node.TEXT_NODE;
 }
 
-function saveToImage({isMobile = false}) {
+function saveToImage() {
   if (blocksToShare.length === 0) {
     alert('No dialogs selected, please select some dialogs by clicking on the checkboxes on the right side of the dialogs.');
     return;
   }
   const board = document.createElement('div');
   board.className = 'share-board';
-  board.style.width = isMobile ? '45rem' : 'null';
+  board.style.width = '45rem';
 
   blocksToShare.forEach((block) => {
     const card = document.createElement('div');
@@ -181,7 +152,7 @@ function saveToImage({isMobile = false}) {
         if (clonedNode.tagName === 'PRE') {
           // hide a button element inside it
           clonedNode.querySelector('button').style.visibility = 'hidden';
-          if (isMobile) clonedNode.querySelector('code').style.setProperty('white-space', 'pre-wrap', 'important');
+          clonedNode.querySelector('code').style.setProperty('white-space', 'pre-wrap', 'important');
         }
         clonedNode.style.marginBottom = '20px';
         card.appendChild(clonedNode);
@@ -206,7 +177,7 @@ function saveToImage({isMobile = false}) {
   const footerText = document.createElement('p');
   footerText.style.fontSize = '0.8rem';
   footerText.style.color = '#74728a';
-  footer.style.opacity = 0.8;
+  footer.style.opacity = '0.8';
   footerText.textContent = 'via ShareGPT - Chrome Extension';
   footer.appendChild(logo);
   footer.appendChild(footerText);
@@ -413,22 +384,6 @@ function injectStyles() {
       z-index: 10000;
       font-weight: normal;
     }
-
-    .save-button-for-mobile-view {
-      background-color: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      position: fixed;
-      top: 120px;
-      cursor: pointer;
-      display: none;
-      right: 20px;
-      width: 120px;
-      height: 40px;
-      z-index: 10000;
-      font-weight: normal;
-    }
   `;
 
   const style = document.createElement('style');
@@ -436,10 +391,6 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// todo: write readme, git repo description
 // todo: px to rem
-
 // todo: add light mode
-// todo: share as a link to a page with original content
-// todo: share as a video in the form of chatting
 // todo: not use arbitrary class names to locate contents

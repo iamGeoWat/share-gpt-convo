@@ -19,7 +19,7 @@
   "permissions": [],
   "content_scripts": [
     {
-      "matches": ["*://chat.openai.com/chat/*"],
+      "matches": ["*://chat.openai.com/c/*"],
       "run_at": "document_idle",
       "js": ["contentScript.js"]
     }

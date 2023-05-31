@@ -3,13 +3,13 @@
 
 Share-GPT is a Chrome extension that allows users to easily generate images from ChatGPT dialogs and share them with others.
 
-## Early Development - Todo
+## Development - Todo
 
 - [ ] Write and Correct README and set up the Git repository description
 - [ ] Convert `px` to `rem` for better responsiveness
 - [x] Enhance styles for better mobile readability
 - [ ] Add light mode support
-- [ ] Implement sharing as a link to a page with the original content
+- [x] (Done by OpenAI!)Sharing as a link to a page with the original content
 - [ ] Enable sharing as a video in the form of a chat conversation
 - [ ] Avoid using arbitrary class names to locate contents
 
