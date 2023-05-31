@@ -331,10 +331,28 @@ function injectStyles() {
       opacity: 1;
     }
 
+    .dark {
+      .share-button {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+      .save-button {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+      .share-board {
+        background-color: #131723;
+      }
+      .share-card {
+        box-shadow: 5px 10px 30px -10px rgba(0, 0, 20, 0.4);
+        background-color: #222734;
+      }
+    }
+
     /* style the share button */
     .share-button {
-      background-color: rgba(255, 255, 255, 0.2);
-      color: white;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: #222;
       border: none;
       border-radius: 5px;
       position: fixed;
@@ -356,22 +374,23 @@ function injectStyles() {
       padding-right: 50px;
       padding-top: 80px;
       padding-bottom: 60px;
-      background-color: #131723;
+      background-color: rgba(252, 250, 242, 100);
       background-image: var(--texture-url);
     }
 
+
     .share-card {
-      box-shadow: 5px 10px 30px -10px rgba(0, 0, 20, 0.4);
+      box-shadow: 5px 10px 15px -10px rgba(0, 0, 0, 0.3);
       padding: 30px;
       border-radius: 5px;
       margin-bottom: 30px;
-      background-color: #222734;
+      background-color: rgba(255,255,251,100);
       background-image: var(--texture-url);
     }
 
     .save-button {
-      background-color: rgba(255, 255, 255, 0.2);
-      color: white;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: #222;
       border: none;
       border-radius: 5px;
       position: fixed;
