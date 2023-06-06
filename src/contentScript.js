@@ -45,7 +45,7 @@ function addSaveButton() {
     );
     if (checkedCheckboxes.length === 0) {
       // alert when no checkboxes are checked
-      alert('No dialogs selected, please select some dialogs by clicking on the checkboxes✅ on the right side👉. Enlarge the browser↔️ if you can\'t see the checkboxes.');
+      alert('No dialogs selected, please select some dialogs by clicking on the checkboxes✅ on the left👈. Enlarge the browser↔️ if you can\'t see the checkboxes.');
       return
     }
     checkedCheckboxes.forEach((checkbox) => {
@@ -250,8 +250,10 @@ function toggleCollapseDialogs() {
 function addCheckboxes() {
   let dialogs = document.querySelectorAll(arbitraryClassNames['dialogs']);
   dialogs.forEach((element) => {
-    if (!isQuestion(element)) {
+    let isQuestionResult = isQuestion(element);
+    if (!isQuestionResult) {
       element = element.firstChild;
+      console.log(element);
     }
     // Create a new container for the custom checkbox
     const checkboxContainer = document.createElement('div');
@@ -274,14 +276,20 @@ function addCheckboxes() {
 
     // Add the container to the body (since it's using 'fixed' positioning)
     checkboxContainer.style.display = showingCheckboxes ? 'block' : 'none';
-    element.parentElement.appendChild(checkboxContainer);
+    let elementToAppendTo = null;
+    if (isQuestionResult) {
+      elementToAppendTo = element.parentElement.parentElement.previousElementSibling.firstChild;
+    } else {
+      elementToAppendTo = element.parentElement.parentElement.parentElement.previousElementSibling.firstChild;
+    }
+    elementToAppendTo.appendChild(checkboxContainer);
+    // element.parentElement.appendChild(checkboxContainer);
   });
 }
 
 function injectStyles() {
   const css = `
     .custom-checkbox {
-      position: absolute;
       right: -8em;
       z-index: 10000;
     }
@@ -306,8 +314,8 @@ function injectStyles() {
       position: absolute;
       top: 0;
       left: 0;
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       background-color: #eee;
       border: 2px solid #555;
       border-radius: 4px;
@@ -324,8 +332,8 @@ function injectStyles() {
     .custom-checkbox label::after {
       content: '';
       position: absolute;
-      top: 3px;
-      left: 7px;
+      top: 6px;
+      left: 12px;
       width: 8px;
       height: 14px;
       border: solid white;
