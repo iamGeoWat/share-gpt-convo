@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ShareGPT",
-  "version": "0.9.1",
-  "description": "Add a Share Button to your ChatGPT experience! Share GPT chats as better-looking images.",
+  "name": "ShareGPTConvo",
+  "version": "1.0.0",
+  "description": "Add a Share Button to your ChatGPT! Share chats as beautiful images that are optimized in style.",
   "icons": {
     "16": "icons/icon_16.png",
     "32": "icons/icon_32.png",
@@ -13,13 +13,13 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Share Gpt",
+    "default_title": "Share GPT Convo",
     "default_popup": "popup.html"
   },
   "permissions": [],
   "content_scripts": [
     {
-      "matches": ["*://chat.openai.com/chat/*"],
+      "matches": ["*://chat.openai.com/c/*"],
       "run_at": "document_idle",
       "js": ["contentScript.js"]
     }
