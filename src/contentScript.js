@@ -187,7 +187,7 @@ function saveToImage() {
   footerText.style.fontSize = '0.8rem';
   footerText.style.color = '#74728a';
   footer.style.opacity = '0.8';
-  footerText.textContent = 'via ShareGPT - Chrome Extension';
+  footerText.textContent = 'via ShareGPTConvo - Chrome Extension';
   footer.appendChild(logo);
   footer.appendChild(footerText);
 
