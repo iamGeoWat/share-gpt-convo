@@ -1,7 +1,7 @@
 {
-  "name": "share-gpt",
-  "version": "0.9.1",
-  "description": "Add a Share Button to your ChatGPT experience! Share GPT chats as better-looking images.",
+  "name": "share-gpt-convo",
+  "version": "1.0.0",
+  "description": "Add a Share Button to your ChatGPT! Share chats as beautiful images that are optimized in style for viewing on mobile and desktop devices.",
   "private": true,
   "scripts": {
     "watch": "webpack --mode=development --watch --config config/webpack.config.js",
