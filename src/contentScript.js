@@ -13,7 +13,7 @@
 
 const htmlToImage = require('html-to-image');
 
-let arbitaryClassNames = {
+let arbitraryClassNames = {
   'avatar': '.rounded-sm',
   'dialogs': 'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap',
   'title-desktop': '.absolute.flex.right-1',
@@ -62,9 +62,9 @@ function addSaveButton() {
 }
 
 function getAvatars() {
-  userAvatar = document.querySelector(`img${arbitaryClassNames['avatar']}`);
+  userAvatar = document.querySelector(`img${arbitraryClassNames['avatar']}`);
   if (userAvatar) userName = userAvatar.alt;
-  gptAvatar = document.querySelector(`div${arbitaryClassNames['avatar']}`).firstChild;
+  gptAvatar = document.querySelector(`div${arbitraryClassNames['avatar']}`).firstChild;
 }
 
 function addShareButton() {
@@ -117,7 +117,7 @@ function saveToImage() {
   const board = document.createElement('div');
   board.className = 'share-board';
   board.style.width = '45rem';
-  let convoTitle = document.querySelector(arbitaryClassNames["title-mobile"])?.innerText || document.querySelector(arbitaryClassNames["title-desktop"])?.previousElementSibling?.innerText
+  let convoTitle = document.querySelector(arbitraryClassNames["title-mobile"])?.innerText || document.querySelector(arbitraryClassNames["title-desktop"])?.previousElementSibling?.innerText
   if (convoTitle) {
     const convoTitleElement = document.createElement('h1');
     convoTitleElement.textContent = convoTitle;
@@ -227,7 +227,7 @@ function saveToImage() {
 }
 
 function toggleCollapseDialogs() {
-  let dialogs = document.querySelectorAll(arbitaryClassNames['dialogs']);
+  let dialogs = document.querySelectorAll(arbitraryClassNames['dialogs']);
   dialogs.forEach((element) => {
     // animated collapse
     if (showingCheckboxes) {
@@ -248,7 +248,7 @@ function toggleCollapseDialogs() {
 }
 
 function addCheckboxes() {
-  let dialogs = document.querySelectorAll(arbitaryClassNames['dialogs']);
+  let dialogs = document.querySelectorAll(arbitraryClassNames['dialogs']);
   dialogs.forEach((element) => {
     if (!isQuestion(element)) {
       element = element.firstChild;
