@@ -208,7 +208,7 @@ function saveToImage() {
       },
     })
     .then((dataUrl) => {
-      // document.body.removeChild(board);
+      document.body.removeChild(board);
       // Create a link element to download the image
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -222,7 +222,7 @@ function saveToImage() {
       link.click();
 
       // Clean up the link element
-      // document.body.removeChild(link);
+      document.body.removeChild(link);
     });
 }
 
