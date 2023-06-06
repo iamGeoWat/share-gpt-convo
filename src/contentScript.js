@@ -15,7 +15,9 @@ const htmlToImage = require('html-to-image');
 
 let arbitaryClassNames = {
   'avatar': '.rounded-sm',
-  'dialogs': 'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap'
+  'dialogs': 'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap',
+  'title-desktop': '.absolute.flex.right-1',
+  'title-mobile': 'h1.text-center'
 };
 
 let shareButton;
@@ -115,6 +117,13 @@ function saveToImage() {
   const board = document.createElement('div');
   board.className = 'share-board';
   board.style.width = '45rem';
+  let convoTitle = document.querySelector(arbitaryClassNames["title-mobile"])?.innerText || document.querySelector(arbitaryClassNames["title-desktop"])?.previousElementSibling?.innerText
+  if (convoTitle) {
+    const convoTitleElement = document.createElement('h1');
+    convoTitleElement.textContent = convoTitle;
+    convoTitleElement.className = 'convo-title';
+    board.appendChild(convoTitleElement);
+  }
 
   blocksToShare.forEach((block) => {
     const card = document.createElement('div');
@@ -199,7 +208,7 @@ function saveToImage() {
       },
     })
     .then((dataUrl) => {
-      document.body.removeChild(board);
+      // document.body.removeChild(board);
       // Create a link element to download the image
       const link = document.createElement('a');
       link.href = dataUrl;
@@ -213,7 +222,7 @@ function saveToImage() {
       link.click();
 
       // Clean up the link element
-      document.body.removeChild(link);
+      // document.body.removeChild(link);
     });
 }
 
@@ -372,7 +381,7 @@ function injectStyles() {
     .share-board {
       padding-left: 50px;
       padding-right: 50px;
-      padding-top: 80px;
+      padding-top: 60px;
       padding-bottom: 60px;
       background-color: rgba(252, 250, 242, 100);
       background-image: var(--texture-url);
@@ -403,6 +412,11 @@ function injectStyles() {
       z-index: 10000;
       font-weight: normal;
     }
+
+    .convo-title {
+      margin-bottom: 30px;
+      margin-left: 5px;
+    }
   `;
 
   const style = document.createElement('style');
@@ -411,5 +425,4 @@ function injectStyles() {
 }
 
 // todo: px to rem
-// todo: add light mode
 // todo: not use arbitrary class names to locate contents
