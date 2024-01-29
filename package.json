@@ -1,6 +1,6 @@
 {
   "name": "share-gpt-convo",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Add a Share Button to your ChatGPT! Share chats as beautiful images that are optimized in style for viewing on mobile and desktop devices.",
   "private": true,
   "scripts": {
