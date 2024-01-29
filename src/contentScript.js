@@ -13,11 +13,9 @@
 
 const htmlToImage = require('html-to-image');
 
-let arbitraryClassNames = {
+const arbitraryClassNames = {
   'avatar': '.rounded-sm',
-  'dialogs': 'div.flex.flex-col.items-start.gap-4.whitespace-pre-wrap',
-  'title-desktop': '.absolute.flex.right-1',
-  'title-mobile': 'h1.text-center'
+  'dialogs': 'div.flex.flex-1.text-base.mx-auto',
 };
 
 let shareButton;
@@ -106,7 +104,7 @@ function toggleCheckboxes() {
 }
 
 function isQuestion(node) {
-  return node.firstChild.nodeType === Node.TEXT_NODE;
+  return node.querySelector('[data-message-author-role]')?.dataset['messageAuthorRole'] === 'user';
 }
 
 function saveToImage() {
@@ -117,7 +115,7 @@ function saveToImage() {
   const board = document.createElement('div');
   board.className = 'share-board';
   board.style.width = '45rem';
-  let convoTitle = document.querySelector(arbitraryClassNames["title-mobile"])?.innerText || document.querySelector(arbitraryClassNames["title-desktop"])?.previousElementSibling?.innerText
+  let convoTitle = Array.from(document.querySelectorAll('a')).find(node => node.href === window.location.href)?.textContent;
   if (convoTitle) {
     const convoTitleElement = document.createElement('h1');
     convoTitleElement.textContent = convoTitle;
@@ -139,9 +137,9 @@ function saveToImage() {
     titleAvatar.style.width = '1.5rem';
     const titleAvatarWrapper = document.createElement('div');
     titleAvatarWrapper.style.maxWidth = '1.5rem';
-    titleAvatarWrapper.style.marginRight = '10px';
+    titleAvatarWrapper.style.marginRight = '0.625rem';
     titleAvatarWrapper.appendChild(titleAvatar);
-    title.style.marginBottom = '20px';
+    title.style.marginBottom = '1.25rem';
     title.style.height = '1.5rem';
     title.style.display = 'flex';
     title.style.alignItems = 'center';
@@ -151,21 +149,27 @@ function saveToImage() {
     card.appendChild(title);
 
     if (isQuestion(block)) {
-      const text = document.createElement('p');
-      text.textContent = block.firstChild.textContent;
-      card.appendChild(text);
+      const questionWrapper = document.createElement('div');
+      const questionContent = block.querySelector('[data-message-author-role]')?.childNodes;
+      questionContent.forEach((child) => {
+        questionWrapper.appendChild(child.cloneNode(true));
+      });
+      card.appendChild(questionWrapper);
     } else {
+      const answerWrapper = document.createElement('div');
+      const answerContent = block.querySelector('div.flex.flex-grow')?.childNodes;
       // clone each child element of the block to card
-      block.childNodes.forEach((child) => {
-        let clonedNode = child.cloneNode(true);
+      answerContent.forEach((child) => {
+        const clonedNode = child.cloneNode(true);
         if (clonedNode.tagName === 'PRE') {
           // hide a button element inside it
           clonedNode.querySelector('button').style.visibility = 'hidden';
           clonedNode.querySelector('code').style.setProperty('white-space', 'pre-wrap', 'important');
         }
-        clonedNode.style.marginBottom = '20px';
-        card.appendChild(clonedNode);
+        clonedNode.style.marginBottom = '1.25rem';
+        answerWrapper.appendChild(clonedNode);
       });
+      card.appendChild(answerWrapper);
     }
     board.appendChild(card);
   });
@@ -175,7 +179,7 @@ function saveToImage() {
   footer.style.alignItems = 'center';
   footer.style.marginLeft = '1rem';
   const logo = document.createElement('div');
-  logo.style.marginRight = '5px';
+  logo.style.marginRight = '0.3125rem';
   logo.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 100 100">
           <g fill="#74728a">
@@ -201,8 +205,8 @@ function saveToImage() {
     .toPng(board, {
       width: boardBounds.width,
       height: boardBounds.height,
+      fontEmbedCSS: '',
       style: {
-        transform: 'scale(1)',
         left: 0,
         top: 0,
       },
@@ -231,14 +235,14 @@ function toggleCollapseDialogs() {
   dialogs.forEach((element) => {
     // animated collapse
     if (showingCheckboxes) {
-      element.style.maxHeight = '1000px';
+      element.style.maxHeight = '62.5rem';
       element.style.overflow = 'hidden';
       element.style.transition = 'max-height 0.5s ease-in-out';
       setTimeout(() => {
-        element.style.maxHeight = '100px';
+        element.style.maxHeight = '6.25rem';
       }, 100);
     } else {
-      element.style.maxHeight = '1000px';
+      element.style.maxHeight = '62.5rem';
       setTimeout(() => {
         element.style.maxHeight = null;
         element.style.overflow = 'auto';
@@ -250,11 +254,6 @@ function toggleCollapseDialogs() {
 function addCheckboxes() {
   let dialogs = document.querySelectorAll(arbitraryClassNames['dialogs']);
   dialogs.forEach((element) => {
-    let isQuestionResult = isQuestion(element);
-    if (!isQuestionResult) {
-      element = element.firstChild;
-      console.log(element);
-    }
     // Create a new container for the custom checkbox
     const checkboxContainer = document.createElement('div');
     checkboxContainer.className = 'custom-checkbox';
@@ -276,14 +275,8 @@ function addCheckboxes() {
 
     // Add the container to the body (since it's using 'fixed' positioning)
     checkboxContainer.style.display = showingCheckboxes ? 'block' : 'none';
-    let elementToAppendTo = null;
-    if (isQuestionResult) {
-      elementToAppendTo = element.parentElement.parentElement.previousElementSibling.firstChild;
-    } else {
-      elementToAppendTo = element.parentElement.parentElement.parentElement.previousElementSibling.firstChild;
-    }
+    let elementToAppendTo = element.firstChild;
     elementToAppendTo.appendChild(checkboxContainer);
-    // element.parentElement.appendChild(checkboxContainer);
   });
 }
 
@@ -302,9 +295,9 @@ function injectStyles() {
     /* Create a custom checkbox */
     .custom-checkbox label {
       position: relative;
-      padding-left: 35px;
+      padding-left: 2.1875rem;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 1rem;
       user-select: none;
     }
 
@@ -314,11 +307,11 @@ function injectStyles() {
       position: absolute;
       top: 0;
       left: 0;
-      width: 30px;
-      height: 30px;
+      width: 1.875rem;
+      height: 1.875rem;
       background-color: #eee;
-      border: 2px solid #555;
-      border-radius: 4px;
+      border: 0.125rem solid #555;
+      border-radius: 0.25rem;
       transition: background-color 0.2s, border-color 0.2s;
     }
 
@@ -332,12 +325,12 @@ function injectStyles() {
     .custom-checkbox label::after {
       content: '';
       position: absolute;
-      top: 6px;
-      left: 12px;
-      width: 8px;
-      height: 14px;
+      top: 0.375rem;
+      left: 0.75rem;
+      width: 0.5rem;
+      height: 0.875rem;
       border: solid white;
-      border-width: 0 2px 2px 0;
+      border-width: 0 0.125rem 0.125rem 0;
       transform: rotate(45deg);
       opacity: 0;
       transition: opacity 0.2s;
@@ -361,7 +354,7 @@ function injectStyles() {
         background-color: #131723;
       }
       .share-card {
-        box-shadow: 5px 10px 30px -10px rgba(0, 0, 20, 0.4);
+        box-shadow: 0.3125rem 0.625rem 1.875rem -0.625rem rgba(0, 0, 20, 0.4);
         background-color: #222734;
       }
     }
@@ -371,12 +364,12 @@ function injectStyles() {
       background-color: rgba(0, 0, 0, 0.3);
       color: #222;
       border: none;
-      border-radius: 5px;
+      border-radius: 0.3125rem;
       position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 120px;
-      height: 40px;
+      top: 4.375rem;
+      right: 1.25rem;
+      width: 7.5rem;
+      height: 2.5rem;
       cursor: pointer;
       z-index: 10000;
       font-weight: normal;
@@ -387,43 +380,43 @@ function injectStyles() {
     }
 
     .share-board {
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 60px;
-      padding-bottom: 60px;
+      padding-left: 3.125rem;
+      padding-right: 3.125rem;
+      padding-top: 3.75rem;
+      padding-bottom: 3.75rem;
       background-color: rgba(252, 250, 242, 100);
       background-image: var(--texture-url);
     }
 
-
     .share-card {
-      box-shadow: 5px 10px 15px -10px rgba(0, 0, 0, 0.3);
-      padding: 30px;
-      border-radius: 5px;
-      margin-bottom: 30px;
+      box-shadow: 0.3125rem 0.625rem 1rem -0.625rem rgba(0, 0, 0, 0.3);
+      padding: 2.5rem;
+      border-radius: 0.3125rem;
+      margin-bottom: 1.875rem;
       background-color: rgba(255,255,251,100);
       background-image: var(--texture-url);
+
     }
 
     .save-button {
       background-color: rgba(0, 0, 0, 0.3);
       color: #222;
       border: none;
-      border-radius: 5px;
+      border-radius: 0.3125rem;
       position: fixed;
-      top: 70px;
+      top: 7.5rem;
       cursor: pointer;
       display: none;
-      right: 20px;
-      width: 120px;
-      height: 40px;
+      right: 1.25rem;
+      width: 7.5rem;
+      height: 2.5rem;
       z-index: 10000;
       font-weight: normal;
     }
 
     .convo-title {
-      margin-bottom: 30px;
-      margin-left: 5px;
+      margin-bottom: 2rem;
+      margin-left: 0.3125rem;
     }
   `;
 
@@ -431,6 +424,4 @@ function injectStyles() {
   style.textContent = css;
   document.head.appendChild(style);
 }
-
-// todo: px to rem
 // todo: not use arbitrary class names to locate contents
