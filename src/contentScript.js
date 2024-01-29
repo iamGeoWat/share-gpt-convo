@@ -16,6 +16,7 @@ const htmlToImage = require('html-to-image');
 const arbitraryClassNames = {
   avatar: '.rounded-sm',
   dialogs: 'div.flex.flex-1.text-base.mx-auto',
+  answerDiv: 'div.flex.flex-grow',
 };
 
 let shareButton;
@@ -173,15 +174,18 @@ function saveToImage() {
       card.appendChild(questionWrapper);
     } else {
       const answerWrapper = document.createElement('div');
-      const answerContent =
-        block.querySelector('div.flex.flex-grow')?.childNodes;
+      const answerContent = block.querySelector(
+        arbitraryClassNames.answerDiv
+      )?.childNodes;
+      answerWrapper.style.overflow = 'visible !important';
       // clone each child element of the block to card
       answerContent.forEach((child) => {
         const clonedNode = child.cloneNode(true);
-        if (clonedNode.tagName === 'PRE') {
-          // hide a button element inside it
-          clonedNode.querySelector('button').style.visibility = 'hidden';
-          clonedNode
+        const pre = clonedNode.querySelector('pre');
+        if (pre) {
+          // hide copy code button element inside it
+          pre.querySelector('button').style.visibility = 'hidden';
+          pre
             .querySelector('code')
             .style.setProperty('white-space', 'pre-wrap', 'important');
         }
