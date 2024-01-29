@@ -14,8 +14,8 @@
 const htmlToImage = require('html-to-image');
 
 const arbitraryClassNames = {
-  'avatar': '.rounded-sm',
-  'dialogs': 'div.flex.flex-1.text-base.mx-auto',
+  avatar: '.rounded-sm',
+  dialogs: 'div.flex.flex-1.text-base.mx-auto',
 };
 
 let shareButton;
@@ -43,8 +43,10 @@ function addSaveButton() {
     );
     if (checkedCheckboxes.length === 0) {
       // alert when no checkboxes are checked
-      alert('No dialogs selected, please select some dialogs by clicking on the checkboxes✅ on the left👈. Enlarge the browser↔️ if you can\'t see the checkboxes.');
-      return
+      alert(
+        "No dialogs selected, please select some dialogs by clicking on the checkboxes✅ on the left👈. Enlarge the browser↔️ if you can't see the checkboxes."
+      );
+      return;
     }
     checkedCheckboxes.forEach((checkbox) => {
       // get attribute value of shareid of the checkbox
@@ -62,7 +64,9 @@ function addSaveButton() {
 function getAvatars() {
   userAvatar = document.querySelector(`img${arbitraryClassNames['avatar']}`);
   if (userAvatar) userName = userAvatar.alt;
-  gptAvatar = document.querySelector(`div${arbitraryClassNames['avatar']}`).firstChild;
+  gptAvatar = document.querySelector(
+    `div${arbitraryClassNames['avatar']}`
+  ).firstChild;
 }
 
 function addShareButton() {
@@ -104,18 +108,26 @@ function toggleCheckboxes() {
 }
 
 function isQuestion(node) {
-  return node.querySelector('[data-message-author-role]')?.dataset['messageAuthorRole'] === 'user';
+  return (
+    node.querySelector('[data-message-author-role]')?.dataset[
+      'messageAuthorRole'
+    ] === 'user'
+  );
 }
 
 function saveToImage() {
   if (blocksToShare.length === 0) {
-    alert('No dialogs selected, please select some dialogs by clicking on the checkboxes on the right side of the dialogs.');
+    alert(
+      'No dialogs selected, please select some dialogs by clicking on the checkboxes on the right side of the dialogs.'
+    );
     return;
   }
   const board = document.createElement('div');
   board.className = 'share-board';
   board.style.width = '45rem';
-  let convoTitle = Array.from(document.querySelectorAll('a')).find(node => node.href === window.location.href)?.textContent;
+  let convoTitle = Array.from(document.querySelectorAll('a')).find(
+    (node) => node.href === window.location.href
+  )?.textContent;
   if (convoTitle) {
     const convoTitleElement = document.createElement('h1');
     convoTitleElement.textContent = convoTitle;
@@ -131,7 +143,9 @@ function saveToImage() {
     const titleText = document.createElement('h2');
     titleText.textContent = isQuestion(block) ? 'Me' : 'GPT';
     const title = document.createElement('div');
-    const titleAvatar = isQuestion(block) ? userAvatar.cloneNode(true) : gptAvatar.cloneNode(true);
+    const titleAvatar = isQuestion(block)
+      ? userAvatar.cloneNode(true)
+      : gptAvatar.cloneNode(true);
     titleAvatar.style.position = 'relative';
     titleAvatar.style.height = '1.5rem';
     titleAvatar.style.width = '1.5rem';
@@ -150,21 +164,26 @@ function saveToImage() {
 
     if (isQuestion(block)) {
       const questionWrapper = document.createElement('div');
-      const questionContent = block.querySelector('[data-message-author-role]')?.childNodes;
+      const questionContent = block.querySelector(
+        '[data-message-author-role]'
+      )?.childNodes;
       questionContent.forEach((child) => {
         questionWrapper.appendChild(child.cloneNode(true));
       });
       card.appendChild(questionWrapper);
     } else {
       const answerWrapper = document.createElement('div');
-      const answerContent = block.querySelector('div.flex.flex-grow')?.childNodes;
+      const answerContent =
+        block.querySelector('div.flex.flex-grow')?.childNodes;
       // clone each child element of the block to card
       answerContent.forEach((child) => {
         const clonedNode = child.cloneNode(true);
         if (clonedNode.tagName === 'PRE') {
           // hide a button element inside it
           clonedNode.querySelector('button').style.visibility = 'hidden';
-          clonedNode.querySelector('code').style.setProperty('white-space', 'pre-wrap', 'important');
+          clonedNode
+            .querySelector('code')
+            .style.setProperty('white-space', 'pre-wrap', 'important');
         }
         clonedNode.style.marginBottom = '1.25rem';
         answerWrapper.appendChild(clonedNode);
